@@ -12,6 +12,7 @@ public class NPCCarium : MonoBehaviour {
     public Player player;
     public CariumWaypoint cw;
     public SpawnParts sp;
+    string questToGive = "";
 
     bool displayThis = false;
 
@@ -29,23 +30,24 @@ public class NPCCarium : MonoBehaviour {
 
     void Start()
     {
-        dialogue = "Hello Player! How are you doing? I must ask a favor of you. I have 4 spare parts that are scattered around the city " +
-                   "please pick them up and bring them back to me!";
-    }
-    void Update()
-    {/*
-        float distance = Vector3.Distance(player.transform.position, this.transform.position);
-        if (distance < 20)
+        if (!player.hasDoneQuest("Spare Parts"))
         {
-            isClose = true;
-            Debug.Log("Player is within 4 units of NPC");
+            dialogue = "Hello Player! How are you doing? I must ask a favor of you. I have 4 spare parts that are scattered around the city " +
+                       "please pick them up and bring them back to me!";
+            questToGive = "Spare Parts";
+        }
+        else if (player.questsToTurnIn.Contains("Spare Parts"))
+        {
+            dialogue = "Ah! You have found all four parts, thank you very much!";
         }
         else
         {
-            isClose = false;
-            Debug.Log("Player is no longer within 4 units of NPC");
+            dialogue = "I have no further favors to ask you.";
+            questToGive = "";
         }
-        */
+    }   
+    void Update()
+    {
         if (cw.isTrue())
         {
             isClose = true;
@@ -83,22 +85,36 @@ public class NPCCarium : MonoBehaviour {
             // Close button
             //if (GUI.Button(new Rect(350, 53, 22, 15), "x"))
             //{
-                //Debug.Log("Closed the dialogue box.");
+            //Debug.Log("Closed the dialogue box.");
             //    talk = false;
             //}
-
-            //(h-position, v-position, h-size, v-size)
-            if (GUI.Button(new Rect(307, 425, 64, 20), "Decline"))
+            if (player.questsToTurnIn.Contains("Spare Parts"))
             {
-                talk = false;
-                player.notOnQuest();
+                if (GUI.Button(new Rect(307, 425, 64, 20), "Turn In"))
+                {
+                    talk = false;
+                    player.notOnQuest();
+                    player.questCompleted("Spare Parts");
+                }
             }
-
-            if(GUI.Button(new Rect(207, 425, 64, 20), "Accept"))
+            else
             {
-                talk = false;
-                player.goOnQuest("Lost Parts");
-                sp.SpawnAllParts();
+                //(h-position, v-position, h-size, v-size)
+                if (GUI.Button(new Rect(307, 425, 64, 20), "Decline"))
+                {
+                    talk = false;
+                    player.notOnQuest();
+                }
+
+                if (GUI.Button(new Rect(207, 425, 64, 20), "Accept"))
+                {
+                    talk = false;
+                    player.goOnQuest(questToGive);
+                    if (questToGive == "Spare Parts")
+                    {
+                        sp.SpawnAllParts();
+                    }
+                }
             }
         }
     }

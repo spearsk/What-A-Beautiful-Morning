@@ -10,6 +10,7 @@ public class Player : MonoBehaviour {
     string listOfCurrentQuests = "";
     public ArrayList currentQuests = new ArrayList();
     public ArrayList completedQuests = new ArrayList();
+    public ArrayList questsToTurnIn = new ArrayList();
 
     // Use this for initialization
     void Start () {
@@ -49,13 +50,15 @@ public class Player : MonoBehaviour {
         return isOnQuest = false;
     }
 
-    public bool questCompleted()
+    public bool questCompleted(string quest)
     {
+        questsToTurnIn.Add(quest);
         return questComplete = true;
     }
 
     public void questTurnIn(string quest)
     {
+        questsToTurnIn.Remove(quest);
         completedQuests.Add(quest);
     }
 
@@ -82,10 +85,36 @@ public class Player : MonoBehaviour {
         }
     }
 
+    public bool hasDoneQuest(string quest)
+    {
+        if (completedQuests.Contains(quest))
+         {
+            return true;
+         }
+        else
+        {
+            return false;
+        }
+    }
+
+    public bool isReadyToTurnIn(string quest)
+    {
+        if (questComplete && !questTurnedIn)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+         
+    }
+
+
     void OnGUI()
     {
         GUI.skin.box.wordWrap = true;
-        if (questComplete == true)
+        if (questComplete)
         {
             GUI.Box(new Rect(Screen.width / 2 + Screen.width / 3, Screen.height / 2 - Screen.height / 3, 100, 100), "Quest completed!");
         }
