@@ -12,18 +12,18 @@ public class Player : MonoBehaviour {
     public ArrayList completedQuests = new ArrayList();
     public ArrayList questsToTurnIn = new ArrayList();
 
+    private string collected;
+    int numCollected = 0;
+    private bool showGUIPickup = false;
+    private GameObject itemToDestroy;
+
     // Use this for initialization
     void Start () {
         foreach (string value in currentQuests)
         {
-            Debug.Log(value);
+            //Debug.Log(value);
         }
     }
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
 
     public bool isNowNear()
     {
@@ -40,7 +40,7 @@ public class Player : MonoBehaviour {
 
         foreach (string value in currentQuests)
         {
-            Debug.Log(value);
+            //Debug.Log(value);
         }
         return isOnQuest = true;
     }
@@ -52,6 +52,7 @@ public class Player : MonoBehaviour {
 
     public bool questCompleted(string quest)
     {
+        currentQuests.Remove(quest);
         questsToTurnIn.Add(quest);
         return questComplete = true;
     }
@@ -60,6 +61,8 @@ public class Player : MonoBehaviour {
     {
         questsToTurnIn.Remove(quest);
         completedQuests.Add(quest);
+        notOnQuest();
+        questComplete = false;
     }
 
     public void CurrentQuestsList()
@@ -114,6 +117,18 @@ public class Player : MonoBehaviour {
     void OnGUI()
     {
         GUI.skin.box.wordWrap = true;
+
+        if (showGUIPickup == true)
+        {
+            GUI.Label(new Rect(Screen.width / 2 + Screen.width / 20, Screen.height / 3 + Screen.height / 3, 100, 100), "Take (T)");
+
+        }
+
+        if (isOnThisQuest("Spare Parts"))
+        {
+            GUI.Box(new Rect(Screen.width / 2 + Screen.width / 3, Screen.height / 2 - Screen.height / 3, 100, 100), "Number of parts collected: " + numCollected.ToString());
+        }
+
         if (questComplete)
         {
             GUI.Box(new Rect(Screen.width / 2 + Screen.width / 3, Screen.height / 2 - Screen.height / 3, 100, 100), "Quest completed!");
@@ -123,5 +138,54 @@ public class Player : MonoBehaviour {
         {
             GUI.Box(new Rect(Screen.width / 2 + Screen.width / 3, Screen.height / 2 - Screen.height / 3, 100, 100), listOfCurrentQuests);
         }
+    }
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            itemCollected();
+        }
+    }
+
+    void OnTriggerEnter(Collider col)
+    {
+
+        if (col.gameObject.tag == "BoltM6(Clone)")
+        {
+            //Debug.Log(col + " has collided with " + this.gameObject);
+            itemToDestroy = col.gameObject;
+            showGUIPickup = true;
+        }
+        if (col.gameObject.tag == "BoltM6Bit(Clone)")
+        {
+            //Debug.Log(col + " has collided with " + this.gameObject);
+            itemToDestroy = col.gameObject;
+            showGUIPickup = true;
+        }
+        if (col.gameObject.tag == "NutM6(Clone)")
+        {
+            //Debug.Log(col + " has collided with " + this.gameObject);
+            itemToDestroy = col.gameObject;
+            showGUIPickup = true;
+        }
+        if (col.gameObject.tag == "NutM62(Clone)")
+        {
+            //Debug.Log(col + " has collided with " + this.gameObject);
+            itemToDestroy = col.gameObject;
+            showGUIPickup = true;
+        }
+    }
+
+    void itemCollected()
+    {
+        numCollected++;
+        Destroy(itemToDestroy);
+
+        if (numCollected == 4)
+        {
+            questCompleted("Spare Parts");
+        }
+
+        showGUIPickup = false;
     }
 }

@@ -1,12 +1,9 @@
 ﻿using UnityEngine;
-using System.Collections;
-using UnityEditor;
 
 public class SpawnParts : MonoBehaviour {
     // mutiple prefab objects
     public Transform[] prefab;
     public bool SpawnStuff = false;
-    Player pl;
 
     public void SpawnAllParts()
     {

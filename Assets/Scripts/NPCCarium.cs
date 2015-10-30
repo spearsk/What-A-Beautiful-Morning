@@ -30,7 +30,12 @@ public class NPCCarium : MonoBehaviour {
 
     void Start()
     {
-        if (!player.hasDoneQuest("Spare Parts"))
+    }   
+    void Update()
+    {
+        ////Debug.Log(player.isOnThisQuest("Spare Parts"));
+        ////Debug.Log(player.questsToTurnIn.Contains("Spare Parts"));
+        if (player.isOnThisQuest("Spare Parts") == false && player.questsToTurnIn.Contains("Spare Parts") == false && player.hasDoneQuest("Spare Parts") == false)
         {
             dialogue = "Hello Player! How are you doing? I must ask a favor of you. I have 4 spare parts that are scattered around the city " +
                        "please pick them up and bring them back to me!";
@@ -45,9 +50,6 @@ public class NPCCarium : MonoBehaviour {
             dialogue = "I have no further favors to ask you.";
             questToGive = "";
         }
-    }   
-    void Update()
-    {
         if (cw.isTrue())
         {
             isClose = true;
@@ -85,7 +87,7 @@ public class NPCCarium : MonoBehaviour {
             // Close button
             //if (GUI.Button(new Rect(350, 53, 22, 15), "x"))
             //{
-            //Debug.Log("Closed the dialogue box.");
+            //////Debug.Log("Closed the dialogue box.");
             //    talk = false;
             //}
             if (player.questsToTurnIn.Contains("Spare Parts"))
@@ -93,8 +95,15 @@ public class NPCCarium : MonoBehaviour {
                 if (GUI.Button(new Rect(307, 425, 64, 20), "Turn In"))
                 {
                     talk = false;
+                    player.questTurnIn("Spare Parts");
+                }
+            }
+            else if(questToGive == "")
+            {
+                if (GUI.Button(new Rect(307, 425, 64, 20), "Goodbye"))
+                {
+                    talk = false;
                     player.notOnQuest();
-                    player.questCompleted("Spare Parts");
                 }
             }
             else

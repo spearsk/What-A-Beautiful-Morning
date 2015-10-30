@@ -7,7 +7,6 @@ public class PickUpItem : MonoBehaviour
     int numCollected = 0;
     private bool showGUI = false;
     private GameObject itemToDestroy;
-    public Player pl;
 
     void Update()
     {
@@ -22,7 +21,7 @@ public class PickUpItem : MonoBehaviour
 
         if (col.gameObject.tag == "Player")
         {
-            Debug.Log(col + " has collided with " + this.gameObject);
+            //Debug.Log(col + " has collided with " + this.gameObject);
             itemToDestroy = this.gameObject;
             showGUI = true;
         }
