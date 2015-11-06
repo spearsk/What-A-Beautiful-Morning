@@ -1,19 +1,26 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Text;
+using System;
 
 public class Player : MonoBehaviour {
-    public bool isNear = false;
-    public bool isOnQuest = false;
-    public bool questComplete = false;
-    public bool questTurnedIn = false;
+    public static bool test = false;
+    bool isNear = false;
+    bool isOnQuest = false;
+    bool questComplete = false;
+    bool questTurnedIn = false;
+	public bool showNewPlayerHelp = true;
+	public bool showPlayerClickOnCarium = false;
     string listOfCurrentQuests = "";
     public ArrayList currentQuests = new ArrayList();
     public ArrayList completedQuests = new ArrayList();
     public ArrayList questsToTurnIn = new ArrayList();
+	public int stopShowing = 0;
+	int numberCollected = 0;
+	ArrayList pickedUp = new ArrayList();
+    public GameObject lightSpace;
 
     private string collected;
-    int numCollected = 0;
     private bool showGUIPickup = false;
     private GameObject itemToDestroy;
 
@@ -116,59 +123,97 @@ public class Player : MonoBehaviour {
 
     void OnGUI()
     {
+        Light lt = lightSpace.GetComponent<Light>();
+
         GUI.skin.box.wordWrap = true;
 
+		if(showNewPlayerHelp)
+		{
+			GUI.Box(new Rect(Screen.width / 2, Screen.height / 2 - Screen.height / 3 - 50, 300, 50), "Walk forward and speak to Carium to begin your adventure.");
+		}
+		
+		if(showPlayerClickOnCarium && stopShowing < 2)
+		{
+			GUI.Box(new Rect(Screen.width / 2, Screen.height / 2 - Screen.height / 3 - 50, 300, 25), "Click on Carium to interact!");
+		}
+		
         if (showGUIPickup == true)
         {
-            GUI.Label(new Rect(Screen.width / 2 + Screen.width / 20, Screen.height / 3 + Screen.height / 3, 100, 100), "Take (T)");
-
+            GUI.Box(new Rect(Screen.width / 2 + Screen.width / 20, Screen.height / 3 + Screen.height / 3, 100, 25), "Take (T)");
         }
 
         if (isOnThisQuest("Spare Parts"))
         {
-            GUI.Box(new Rect(Screen.width / 2 + Screen.width / 3, Screen.height / 2 - Screen.height / 3, 100, 100), "Number of parts collected: " + numCollected.ToString());
+            GUI.Box(new Rect(Screen.width / 2 + Screen.width / 3, Screen.height / 2 - Screen.height / 3, 100, 50), "Number of parts collected: " + numberCollected.ToString());
         }
 
         if (questComplete)
         {
-            GUI.Box(new Rect(Screen.width / 2 + Screen.width / 3, Screen.height / 2 - Screen.height / 3, 100, 100), "Quest completed!");
+            GUI.Box(new Rect(Screen.width / 2 + Screen.width / 3, Screen.height / 2 - Screen.height / 3, 100, 50), "Quest completed!");
         }
-
-        if(isOnQuest)
+        if (lt.intensity > 0)
         {
-            GUI.Box(new Rect(Screen.width / 2 + Screen.width / 3, Screen.height / 2 - Screen.height / 3, 100, 100), listOfCurrentQuests);
+            GUI.Box(new Rect(Screen.width / 2, Screen.height / 2 - Screen.height / 3 - 50, 300, 50), "Go home and get some rest.");
         }
     }
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.T))
         {
-            itemCollected();
+			try{
+				if(!pickedUp.Contains(itemToDestroy.name))
+				{
+					pickedUp.Add(itemToDestroy.name);
+					numberCollected++;
+					itemCollected();
+			
+					if (numberCollected == 4)
+					{
+						questCompleted("Spare Parts");
+					}
+				}
+			}
+			catch (Exception e)
+			{
+			}
         }
     }
 
     void OnTriggerEnter(Collider col)
     {
-
-        if (col.gameObject.tag == "BoltM6(Clone)")
+        if(col.gameObject.name == "DoorCollider")
+        {
+            Light lt = lightSpace.GetComponent<Light>();
+            lt.intensity = 0;
+            Behaviour halo = (Behaviour)lt.GetComponent("Halo");
+            halo.enabled = true;
+        }
+		if(col.gameObject.name == "CariumInteractBox")
+		{
+			Debug.Log("Player is in the interact box.");
+			showNewPlayerHelp = false;
+			showPlayerClickOnCarium = true;
+			stopShowing++;
+		}
+        if (col.gameObject.name == "BoltM6(Clone)")
         {
             //Debug.Log(col + " has collided with " + this.gameObject);
             itemToDestroy = col.gameObject;
             showGUIPickup = true;
         }
-        if (col.gameObject.tag == "BoltM6Bit(Clone)")
+        if (col.gameObject.name == "BoltM6Bit(Clone)")
+        {
+            //Debug.Log(col + " has collided with " + this.gameObject);
+            itemToDestroy = col.gameObject;
+            showGUIPickup = true;
+		}
+        if (col.gameObject.name == "NutM6(Clone)")
         {
             //Debug.Log(col + " has collided with " + this.gameObject);
             itemToDestroy = col.gameObject;
             showGUIPickup = true;
         }
-        if (col.gameObject.tag == "NutM6(Clone)")
-        {
-            //Debug.Log(col + " has collided with " + this.gameObject);
-            itemToDestroy = col.gameObject;
-            showGUIPickup = true;
-        }
-        if (col.gameObject.tag == "NutM62(Clone)")
+        if (col.gameObject.name == "NutM62(Clone)")
         {
             //Debug.Log(col + " has collided with " + this.gameObject);
             itemToDestroy = col.gameObject;
@@ -178,14 +223,7 @@ public class Player : MonoBehaviour {
 
     void itemCollected()
     {
-        numCollected++;
         Destroy(itemToDestroy);
-
-        if (numCollected == 4)
-        {
-            questCompleted("Spare Parts");
-        }
-
         showGUIPickup = false;
     }
 }

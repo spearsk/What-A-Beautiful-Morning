@@ -13,7 +13,7 @@ public class NPCCarium : MonoBehaviour {
     public CariumWaypoint cw;
     public SpawnParts sp;
     string questToGive = "";
-
+    public GameObject lightSpace;
     bool displayThis = false;
 
     void OnMouseOver()
@@ -30,24 +30,25 @@ public class NPCCarium : MonoBehaviour {
 
     void Start()
     {
+        lightSpace.AddComponent<Light>();
+        Light lt = lightSpace.GetComponent<Light>();
+        lt.intensity = 0;
     }   
     void Update()
     {
-        ////Debug.Log(player.isOnThisQuest("Spare Parts"));
-        ////Debug.Log(player.questsToTurnIn.Contains("Spare Parts"));
         if (player.isOnThisQuest("Spare Parts") == false && player.questsToTurnIn.Contains("Spare Parts") == false && player.hasDoneQuest("Spare Parts") == false)
         {
-            dialogue = "Hello Player! How are you doing? I must ask a favor of you. I have 4 spare parts that are scattered around the city " +
+            dialogue = "Hello Player! How are you doing? I must ask a favour of you. I have 4 spare parts that are scattered around the city " +
                        "please pick them up and bring them back to me!";
             questToGive = "Spare Parts";
         }
         else if (player.questsToTurnIn.Contains("Spare Parts"))
         {
-            dialogue = "Ah! You have found all four parts, thank you very much!";
+            dialogue = "Ah! You have found all four parts, thank you very much! You should go to your house to get some rest, I will have more for you to do tomorrow";
         }
         else
         {
-            dialogue = "I have no further favors to ask you.";
+            dialogue = "I have no further favours to ask you. Go home and get some rest and I will have something for you tomorrow.";
             questToGive = "";
         }
         if (cw.isTrue())
@@ -69,8 +70,10 @@ public class NPCCarium : MonoBehaviour {
             if (highlighted == true)
             {
                 talk = true;
+				player.showPlayerClickOnCarium = false;
             }
         }
+
         if (talk && isClose)
         {
 
@@ -96,6 +99,11 @@ public class NPCCarium : MonoBehaviour {
                 {
                     talk = false;
                     player.questTurnIn("Spare Parts");
+
+                    Light lt = lightSpace.GetComponent<Light>();
+                    lt.intensity = 8;
+                    Behaviour halo = (Behaviour)lt.GetComponent("Halo");
+                    halo.enabled = true;
                 }
             }
             else if(questToGive == "")
@@ -104,6 +112,8 @@ public class NPCCarium : MonoBehaviour {
                 {
                     talk = false;
                     player.notOnQuest();
+                    Light lt = lightSpace.GetComponent<Light>();
+                    lt.intensity = 6;
                 }
             }
             else
