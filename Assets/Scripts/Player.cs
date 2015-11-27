@@ -6,30 +6,37 @@ using System;
 public class Player : MonoBehaviour {
     public static bool test = false;
     bool isNear = false;
-    bool isOnQuest = false;
-    bool questComplete = false;
-    bool questTurnedIn = false;
-	public bool showNewPlayerHelp = true;
-	public bool showPlayerClickOnCarium = false;
-    string listOfCurrentQuests = "";
-    public ArrayList currentQuests = new ArrayList();
-    public ArrayList completedQuests = new ArrayList();
-    public ArrayList questsToTurnIn = new ArrayList();
-	public int stopShowing = 0;
+    bool isOnTask = false;
+    bool TaskComplete = false;
+    bool TaskTurnedIn = false;
+    string listOfCurrentTasks = "";
+    public ArrayList currentTasks = new ArrayList();
+    public ArrayList completedTasks = new ArrayList();
+    public ArrayList TasksToTurnIn = new ArrayList();
+	int stopShowing = 0;
 	int numberCollected = 0;
 	ArrayList pickedUp = new ArrayList();
     public GameObject lightSpace;
-
+    private bool showSleepTrigger = false;
     private string collected;
     private bool showGUIPickup = false;
     private GameObject itemToDestroy;
 
+    //Statics
+    public static string nextScene = "PreDestructionCity";
+    public static bool isInHouse = false;
+    public static bool showNewPlayerHelp = true;
+    public static bool showPlayerClickOnCarium = false;
+    public static bool showPlayerClickOnKyle = false;
+    public static bool hasSlept = false;
+    public static bool isNearBed = false;
+    public static bool isNearDoorInsideHouse = false;
+    public static bool showGoOutside = false;
+    public static bool hasDoneTask1 = false;
+    public static bool hasDoneTask2 = false;
+
     // Use this for initialization
     void Start () {
-        foreach (string value in currentQuests)
-        {
-            //Debug.Log(value);
-        }
     }
 
     public bool isNowNear()
@@ -41,51 +48,51 @@ public class Player : MonoBehaviour {
         return isNear = false;
     }
 
-    public bool goOnQuest(string quest)
+    public bool goOnTask(string Task)
     {
-        currentQuests.Add(quest);
+        currentTasks.Add(Task);
 
-        foreach (string value in currentQuests)
+        foreach (string value in currentTasks)
         {
             //Debug.Log(value);
         }
-        return isOnQuest = true;
+        return isOnTask = true;
     }
 
-    public bool notOnQuest()
+    public bool notOnTask()
     {
-        return isOnQuest = false;
+        return isOnTask = false;
     }
 
-    public bool questCompleted(string quest)
+    public bool TaskCompleted(string Task)
     {
-        currentQuests.Remove(quest);
-        questsToTurnIn.Add(quest);
-        return questComplete = true;
+        currentTasks.Remove(Task);
+        TasksToTurnIn.Add(Task);
+        return TaskComplete = true;
     }
 
-    public void questTurnIn(string quest)
+    public void TaskTurnIn(string Task)
     {
-        questsToTurnIn.Remove(quest);
-        completedQuests.Add(quest);
-        notOnQuest();
-        questComplete = false;
+        TasksToTurnIn.Remove(Task);
+        completedTasks.Add(Task);
+        notOnTask();
+        TaskComplete = false;
     }
 
-    public void CurrentQuestsList()
+    public void CurrentTasksList()
     {
         StringBuilder sb = new StringBuilder();
-        foreach ( string quest in completedQuests)
+        foreach ( string Task in completedTasks)
         {
-            sb.Append(quest);
+            sb.Append(Task);
         }
 
-       listOfCurrentQuests = sb.ToString();
+       listOfCurrentTasks = sb.ToString();
     }
 
-    public bool isOnThisQuest(string quest)
+    public bool isOnThisTask(string Task)
     {
-        if (currentQuests.Contains(quest))
+        if (currentTasks.Contains(Task))
         {
             return true;
         }
@@ -95,9 +102,9 @@ public class Player : MonoBehaviour {
         }
     }
 
-    public bool hasDoneQuest(string quest)
+    public bool hasDoneTask(string Task)
     {
-        if (completedQuests.Contains(quest))
+        if (completedTasks.Contains(Task))
          {
             return true;
          }
@@ -107,9 +114,9 @@ public class Player : MonoBehaviour {
         }
     }
 
-    public bool isReadyToTurnIn(string quest)
+    public bool isReadyToTurnIn(string Task)
     {
-        if (questComplete && !questTurnedIn)
+        if (TaskComplete && !TaskTurnedIn)
         {
             return true;
         }
@@ -127,12 +134,12 @@ public class Player : MonoBehaviour {
 
         GUI.skin.box.wordWrap = true;
 
-		if(showNewPlayerHelp)
+		if(showNewPlayerHelp && !isInHouse)
 		{
 			GUI.Box(new Rect(Screen.width / 2, Screen.height / 2 - Screen.height / 3 - 50, 300, 50), "Walk forward and speak to Carium to begin your adventure.");
 		}
-		
-		if(showPlayerClickOnCarium && stopShowing < 2)
+
+        if (showPlayerClickOnCarium && isNear && Player.hasDoneTask1 == false)
 		{
 			GUI.Box(new Rect(Screen.width / 2, Screen.height / 2 - Screen.height / 3 - 50, 300, 25), "Click on Carium to interact!");
 		}
@@ -142,18 +149,46 @@ public class Player : MonoBehaviour {
             GUI.Box(new Rect(Screen.width / 2 + Screen.width / 20, Screen.height / 3 + Screen.height / 3, 100, 25), "Take (T)");
         }
 
-        if (isOnThisQuest("Spare Parts"))
+        if (isOnThisTask("Spare Parts"))
         {
             GUI.Box(new Rect(Screen.width / 2 + Screen.width / 3, Screen.height / 2 - Screen.height / 3, 100, 50), "Number of parts collected: " + numberCollected.ToString());
         }
 
-        if (questComplete)
+        if (TaskComplete)
         {
-            GUI.Box(new Rect(Screen.width / 2 + Screen.width / 3, Screen.height / 2 - Screen.height / 3, 100, 50), "Quest completed!");
+            GUI.Box(new Rect(Screen.width / 2 + Screen.width / 3, Screen.height / 2 - Screen.height / 3, 100, 50), "Task completed!");
         }
         if (lt.intensity > 0)
         {
             GUI.Box(new Rect(Screen.width / 2, Screen.height / 2 - Screen.height / 3 - 50, 300, 50), "Go home and get some rest.");
+        }
+        if (showSleepTrigger)
+        {
+            GUI.Box(new Rect(Screen.width / 2 + Screen.width / 20, Screen.height / 3 + Screen.height / 3, 100, 25), "Sleep (E)");
+        }
+
+        if (hasSlept && isInHouse)
+        {
+            GUI.Box(new Rect(Screen.width / 2, Screen.height / 2 - Screen.height / 3 - 50, 300, 50), "Go outside and speak to Carium.");
+        }
+
+        if (!hasSlept && isInHouse)
+        {
+            GUI.Box(new Rect(Screen.width / 2, Screen.height / 2 - Screen.height / 3 - 50, 300, 50), "Go to your Futon to get some sleep.");
+        }
+
+        if (showGoOutside)
+        {
+            GUI.Box(new Rect(Screen.width / 2 + Screen.width / 20, Screen.height / 3 + Screen.height / 3, 100, 25), "Go outside (E)");
+        }
+
+        if (hasSlept && !isInHouse && !isOnThisTask("Find The Culprit"))
+        {
+            GUI.Box(new Rect(Screen.width / 2, Screen.height / 2 - Screen.height / 3 - 50, 300, 50), "Go seek out Carium to find out what happened.");
+        }
+        if (isOnThisTask("Find The Culprit") && Player.hasDoneTask2 == false)
+        {
+            GUI.Box(new Rect(Screen.width / 2, Screen.height / 2 - Screen.height / 3 - 50, 300, 50), "Look around the city and find who...or what did this.");
         }
     }
     void Update()
@@ -169,13 +204,24 @@ public class Player : MonoBehaviour {
 			
 					if (numberCollected == 4)
 					{
-						questCompleted("Spare Parts");
+						TaskCompleted("Spare Parts");
 					}
 				}
 			}
 			catch (Exception e)
 			{
 			}
+        }
+        if (Input.GetKeyUp(KeyCode.E) && isNearBed)
+        {
+           Application.LoadLevel("SleepScene");
+        }
+        if (Input.GetKeyUp(KeyCode.E) && hasSlept)
+        {
+            nextScene = "PostDestructionCity";
+            showGoOutside = false;
+            isInHouse = false;
+            Application.LoadLevel("LoadingScreen");
         }
     }
 
@@ -185,8 +231,6 @@ public class Player : MonoBehaviour {
         {
             Light lt = lightSpace.GetComponent<Light>();
             lt.intensity = 0;
-            Behaviour halo = (Behaviour)lt.GetComponent("Halo");
-            halo.enabled = true;
         }
 		if(col.gameObject.name == "CariumInteractBox")
 		{
@@ -195,6 +239,11 @@ public class Player : MonoBehaviour {
 			showPlayerClickOnCarium = true;
 			stopShowing++;
 		}
+        if (col.gameObject.name == "RobotKyleCollider")
+        {
+            Debug.Log("Player is in the interact box.");
+            showPlayerClickOnKyle = true;
+        }
         if (col.gameObject.name == "BoltM6(Clone)")
         {
             //Debug.Log(col + " has collided with " + this.gameObject);
@@ -218,6 +267,16 @@ public class Player : MonoBehaviour {
             //Debug.Log(col + " has collided with " + this.gameObject);
             itemToDestroy = col.gameObject;
             showGUIPickup = true;
+        }
+        if (col.gameObject.name == "Futon" && !hasSlept)
+        {
+            showSleepTrigger = true;
+            isNearBed = true;
+        }
+        if (col.gameObject.name == "Door Collider" && hasSlept)
+        {
+            showGoOutside = true;
+            isNearDoorInsideHouse = true;
         }
     }
 

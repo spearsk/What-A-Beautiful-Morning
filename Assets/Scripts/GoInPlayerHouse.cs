@@ -11,9 +11,8 @@ public class GoInPlayerHouse : MonoBehaviour {
         
 		if(col.gameObject.name == "Player")
 		{
-            if (player.hasDoneQuest("Spare Parts"))
+            if (player.hasDoneTask("Spare Parts"))
             {
-                Player.test = true;
                 canEnter = true;
                 showEnterHomeGUI = true;
                 Debug.Log("Player may enter the house now.");
@@ -33,7 +32,9 @@ public class GoInPlayerHouse : MonoBehaviour {
     {
         if (Input.GetKeyDown(KeyCode.E) && canEnter)
         {
-            Application.LoadLevel("PlayerRoom");
+            Player.isInHouse = true;
+            Player.nextScene = "PlayerRoom";
+            Application.LoadLevel("LoadingScreen");
         }
     }
 }

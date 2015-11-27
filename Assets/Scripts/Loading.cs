@@ -7,7 +7,7 @@ public class Loading : MonoBehaviour {
     public GameObject Text2;
     public GameObject Text3;
     public GameObject Text4;
-    public string scene;
+    string scene = Player.nextScene;
     bool loaded = false;
 
     // Use this for initialization

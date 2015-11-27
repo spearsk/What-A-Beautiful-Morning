@@ -18,6 +18,7 @@ public class WakeUp : MonoBehaviour {
 	void Update () {
         if (Input.GetKeyUp(KeyCode.E) && cont)
         {
+            Player.hasSlept = true;
             Application.LoadLevel("PlayerRoomPostSleep");
         }
 	}
