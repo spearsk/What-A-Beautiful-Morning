@@ -17,6 +17,13 @@ public class GoInPlayerHouse : MonoBehaviour {
                 showEnterHomeGUI = true;
                 Debug.Log("Player may enter the house now.");
             }
+
+            if (player.hasDoneTask("Spare Parts 2"))
+            {
+                canEnter = true;
+                showEnterHomeGUI = true;
+                Debug.Log("Player may enter the house now.");
+            }
 		}
 	}
 
@@ -30,10 +37,16 @@ public class GoInPlayerHouse : MonoBehaviour {
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.E) && canEnter)
+        if (Input.GetKeyDown(KeyCode.E) && canEnter && player.hasDoneTask("Spare Parts"))
         {
             Player.isInHouse = true;
             Player.nextScene = "PlayerRoom";
+            Application.LoadLevel("LoadingScreen");
+        }
+        if (Input.GetKeyDown(KeyCode.E) && canEnter && player.hasDoneTask("Spare Parts 2"))
+        {
+            Player.isInHouse = true;
+            Player.nextScene = "PlayerRoomEnd";
             Application.LoadLevel("LoadingScreen");
         }
     }

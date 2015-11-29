@@ -16,7 +16,7 @@ public class WakeUp : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (Input.GetKeyUp(KeyCode.E) && cont)
+        if (Input.GetKeyUp(KeyCode.E) && cont && !Player.hasSlept)
         {
             Player.hasSlept = true;
             Application.LoadLevel("PlayerRoomPostSleep");
