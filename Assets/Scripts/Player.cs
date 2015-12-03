@@ -14,13 +14,14 @@ public class Player : MonoBehaviour {
     public ArrayList completedTasks = new ArrayList();
     public ArrayList TasksToTurnIn = new ArrayList();
 	int stopShowing = 0;
-	int numberCollected = 0;
+	public int numberCollected = 0;
 	ArrayList pickedUp = new ArrayList();
     public GameObject lightSpace;
     private bool showSleepTrigger = false;
     private string collected;
     private bool showGUIPickup = false;
     private GameObject itemToDestroy;
+    bool inPostSleepCity = false;
 
     //Statics
     public static string nextScene = "PreDestructionCity";
@@ -34,6 +35,7 @@ public class Player : MonoBehaviour {
     public static bool showGoOutside = false;
     public static bool hasDoneTask1 = false;
     public static bool hasDoneTask2 = false;
+    public FlashStatic flash;
 
     // Use this for initialization
     void Start () {
@@ -154,6 +156,11 @@ public class Player : MonoBehaviour {
             GUI.Box(new Rect(Screen.width / 2 + Screen.width / 3, Screen.height / 2 - Screen.height / 3, 100, 50), "Number of parts collected: " + numberCollected.ToString());
         }
 
+        if (isOnThisTask("Spare Parts 2"))
+        {
+            GUI.Box(new Rect(Screen.width / 2 + Screen.width / 3, Screen.height / 2 - Screen.height / 3, 100, 50), "Number of parts collected: " + numberCollected.ToString());
+        }
+
         if (TaskComplete)
         {
             GUI.Box(new Rect(Screen.width / 2 + Screen.width / 3, Screen.height / 2 - Screen.height / 3, 100, 50), "Task completed!");
@@ -193,7 +200,7 @@ public class Player : MonoBehaviour {
     }
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.T))
+        if (currentTasks.Contains("Spare Parts") && Input.GetKeyDown(KeyCode.T))
         {
 			try{
 				if(!pickedUp.Contains(itemToDestroy.name))
@@ -212,12 +219,34 @@ public class Player : MonoBehaviour {
 			{
 			}
         }
-        if (Input.GetKeyUp(KeyCode.E) && isNearBed)
+        if (currentTasks.Contains("Spare Parts 2") && Input.GetKeyDown(KeyCode.T))
         {
-           Application.LoadLevel("SleepScene");
+            try
+            {
+                if (!pickedUp.Contains(itemToDestroy.name))
+                {
+                    pickedUp.Add(itemToDestroy.name);
+                    numberCollected++;
+                    itemCollected();
+
+                    if (numberCollected == 4)
+                    {
+                        TaskCompleted("Spare Parts 2");
+                        //StartCoroutine(BackToPresent());
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+            }
         }
-        if (Input.GetKeyUp(KeyCode.E) && hasSlept)
+        if (Input.GetKeyUp(KeyCode.E) && !hasSlept && isNearBed)
         {
+            Application.LoadLevel("SleepScene");
+        }
+        if (Input.GetKeyDown(KeyCode.E) && hasSlept && isInHouse)
+        {
+            inPostSleepCity = true;
             nextScene = "PostDestructionCity";
             showGoOutside = false;
             isInHouse = false;
@@ -284,5 +313,15 @@ public class Player : MonoBehaviour {
     {
         Destroy(itemToDestroy);
         showGUIPickup = false;
+    }
+
+    IEnumerator BackToPresent()
+    {
+        flash.showImage = true;
+        Vector3 currentPos = new Vector3();
+        currentPos = transform.position;
+        Application.LoadLevel("PreDestructionCity");
+        yield return new WaitForSeconds(.25f);
+        flash.showImage = false;
     }
 }

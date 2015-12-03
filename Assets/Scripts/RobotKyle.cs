@@ -11,7 +11,10 @@ public class RobotKyle : MonoBehaviour {
     int textLength = 335;
     public RobotKyleWaypoint ckw;
     public Player player;
+    public GameObject carium;
+    NPCCarium carScript;
     string TaskToGive = "";
+    public FlashStatic flash;
 
 
     void OnMouseOver()
@@ -28,11 +31,10 @@ public class RobotKyle : MonoBehaviour {
 
     void Update()
     {
-            if (player.isOnThisTask("Spare Parts") == false && player.TasksToTurnIn.Contains("Spare Parts") == false && Player.hasDoneTask1 == false)
+            if (player.isOnThisTask("Spare Parts") == false && player.TasksToTurnIn.Contains("Find The Culprit") == false && Player.hasDoneTask1)
             {
-                dialogue = "Hello Player! How are you doing? I must ask a favour of you. I have 4 spare parts that are scattered around the city " +
-                           "please pick them up and bring them back to me!";
-                TaskToGive = "Spare Parts";
+                dialogue = "...Are you talking to me? But... you shouldn't be able to see me. Oh dear, this is a problem. " +
+                           "Here, keep yourself busy with that Carium again.";
             }
             if (ckw.isTrue())
             {
@@ -85,13 +87,14 @@ public class RobotKyle : MonoBehaviour {
             //////Debug.Log("Closed the dialogue box.");
             //    talk = false;
             //}
-            if (player.TasksToTurnIn.Contains("Find The Culprit"))
+            if (talk && isClose)
             {
                 if (GUI.Button(new Rect(307, 425, 64, 20), "Turn In"))
                 {
                     talk = false;
                     player.TaskTurnIn("Find The Culprit");
                     Player.hasDoneTask2 = true;
+                    StartCoroutine(CharacterMove1());
                 }
             }
             /*
@@ -118,5 +121,17 @@ public class RobotKyle : MonoBehaviour {
             */
 
         }
+    }
+
+    IEnumerator CharacterMove1()
+    {
+        flash.showImage = true;
+        carium.transform.position = transform.position;
+        carium.transform.rotation = transform.rotation;
+        carScript = carium.GetComponent<NPCCarium>();
+        carScript.carPos = 1;
+        transform.position = new Vector3(100, 100, 100);
+        yield return new WaitForSeconds(.25f);
+        flash.showImage = false;
     }
 }
