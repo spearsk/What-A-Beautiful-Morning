@@ -173,6 +173,7 @@ public class NPCCarium : MonoBehaviour {
                     talk = false;
                     player.goOnTask(TaskToGive);
                     Player.showPlayerClickOnCarium = false;
+                    Player.hasStartedTask2 = true;
                     if (TaskToGive == "Find The Culprit")
                     {
                         sd.SpawnIt();

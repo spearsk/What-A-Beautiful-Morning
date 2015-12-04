@@ -31,7 +31,7 @@ public class RobotKyle : MonoBehaviour {
 
     void Update()
     {
-            if (player.isOnThisTask("Spare Parts") == false && player.TasksToTurnIn.Contains("Find The Culprit") == false && Player.hasDoneTask1)
+            if (player.TasksToTurnIn.Contains("Find The Culprit") == false && Player.hasDoneTask1)
             {
                 dialogue = "...Are you talking to me? But... you shouldn't be able to see me. Oh dear, this is a problem. " +
                            "Here, keep yourself busy with that Carium again.";
@@ -87,7 +87,7 @@ public class RobotKyle : MonoBehaviour {
             //////Debug.Log("Closed the dialogue box.");
             //    talk = false;
             //}
-            if (talk && isClose)
+            if (talk && isClose && Player.hasStartedTask2)
             {
                 if (GUI.Button(new Rect(307, 425, 64, 20), "Turn In"))
                 {
@@ -96,6 +96,10 @@ public class RobotKyle : MonoBehaviour {
                     Player.hasDoneTask2 = true;
                     StartCoroutine(CharacterMove1());
                 }
+            }
+            else
+            {
+
             }
             /*
             else if (Player.hasDoneTask1 == false)

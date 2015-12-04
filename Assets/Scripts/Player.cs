@@ -35,6 +35,7 @@ public class Player : MonoBehaviour {
     public static bool showGoOutside = false;
     public static bool hasDoneTask1 = false;
     public static bool hasDoneTask2 = false;
+    public static bool hasStartedTask2 = false;
     public FlashStatic flash;
 
     // Use this for initialization
